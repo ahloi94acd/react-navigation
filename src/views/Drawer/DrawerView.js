@@ -40,23 +40,18 @@ export default class DrawerView extends React.PureComponent {
     });
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: DrawerViewProps) {
     if (
       this.props.navigation.state.index !== nextProps.navigation.state.index
     ) {
-      const {
-        drawerOpenRoute,
-        drawerCloseRoute,
-        drawerToggleRoute,
-      } = this.props;
       const { routes, index } = nextProps.navigation.state;
-      if (routes[index].routeName === drawerOpenRoute) {
+      if (routes[index].routeName === 'DrawerOpen') {
         this._drawer.openDrawer();
-      } else if (routes[index].routeName === drawerToggleRoute) {
-        if (this.props.navigation.state.index === 0) {
-          this.props.navigation.navigate(drawerOpenRoute);
-        } else {
-          this.props.navigation.navigate(drawerCloseRoute);
+      } else if (routes[index].routeName === 'DrawerToggle') {
+        if (this._drawer.state.drawerShown) {
+          this.props.navigation.dispatch({
+            type: 'NAV_TOGGLE_DRAWER'
+          });
         }
       } else {
         this._drawer.closeDrawer();
@@ -64,22 +59,30 @@ export default class DrawerView extends React.PureComponent {
     }
     this._updateScreenNavigation(nextProps.navigation);
   }
-
+ 
+  _screenNavigationProp: NavigationScreenProp<NavigationStateRoute>;
+ 
   _handleDrawerOpen = () => {
-    const { navigation, drawerOpenRoute } = this.props;
+    const { navigation } = this.props;
     const { routes, index } = navigation.state;
-    if (routes[index].routeName !== drawerOpenRoute) {
-      this.props.navigation.navigate(drawerOpenRoute);
+   
+    if (routes[index].routeName !== 'DrawerOpen') {
+      this.props.navigation.dispatch({
+        type: 'NAV_OPEN_DRAWER'
+      });
     }
   };
-
+ 
   _handleDrawerClose = () => {
-    const { navigation, drawerCloseRoute } = this.props;
+    const { navigation } = this.props;
     const { routes, index } = navigation.state;
-    if (routes[index].routeName !== drawerCloseRoute) {
-      this.props.navigation.navigate(drawerCloseRoute);
+    if (routes[index].routeName !== 'DrawerClose') {
+      this.props.navigation.dispatch({
+        type: 'NAV_CLOSE_DRAWER'
+      });
     }
   };
+ 
 
   _isRouteFocused = route => () => {
     const { state } = this.props.navigation;
